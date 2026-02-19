@@ -1,17 +1,21 @@
 --local player = { x = 100, y = 100, speed = 200, playerWidth = 50, playerHeight = 50 }
 local decleration = "I love you"
-local player = { x = 100, y = 100, speed = 200, playerWidth = 0, playerHeight = 0, limitX = 0, limitY = 0, bottomImage, topImage, angle = 0, bodyAngle = 0, TopWidth = 0, TopHeight = 0, RspawnX = 0, RspawnY = 0, topRotation = 0 } 
+local player = { x = 100, y = 100, speed = 200, playerWidth = 0, playerHeight = 0, limitX = 0, limitY = 0, bottomImage, topImage, angle = 0, bodyAngle = 0, TopWidth = 0, TopHeight = 0, RspawnX = 0, RspawnY = 0, topRotation = 0, topImageFALSE} 
 local spacing = 32;
 local camera = require("libraries/camera")
 local rocket = require("rocket")
-local shot, canshoot = false, true;
+local shot = false;
+player.canShoot = true;
 local rockets = {}
+local moving = false
+local timer = require("timer")
 
 
 function player.loadInformation()
   player.bottomImage = love.graphics.newImage("assets/TankBottom.png")
   player.topImage = love.graphics.newImage("assets/TankTop.png")
   player.playerWidth = player.bottomImage:getWidth()
+  player.topImageFALSE  = love.graphics.newImage("assets/TankTopCANT.png")
   player.playerHeight = player.bottomImage:getHeight()
   player.limitX = 10000000
   player.limitY = 10000000
@@ -45,16 +49,27 @@ function Movement(dt)
     player.y = player.y - yChange
     player.RspawnX = player.RspawnX - xChange
     player.RspawnY = player.RspawnY - yChange
+    moving = true;
   end
 
 
-  if(love.mouse.isDown(1) and canshoot) then
+  if(love.mouse.isDown(1) and player.canShoot and moving == false) then
+    player.canShoot = false;
     local offset = 86;
     local spawnX = player.x - math.cos(player.topRotation + math.rad(90)) * offset
     local spawnY = player.y - math.sin(player.topRotation + math.rad(90)) * offset
     rocket.load(true, spawnX, spawnY , player.topRotation, player.playerWidth, player.playerHeight, 1000)
+
+    if(player.canShoot == false) then 
+
+    timer.crt(1.5,
+    function ()
+
+    player.canShoot = true;
+
+    end)
+    end
     shot = true;
-    canshoot = false;
   end
   --   if player.x < player.limitX then
   --   if love.keyboard.isDown("d") or love.keyboard.isDown("right")  then   
@@ -81,7 +96,7 @@ function Movement(dt)
   --   end 
   -- end
   -- --]
-
+  moving = false
 end
 
 function rotateToMouse()
@@ -121,7 +136,12 @@ function player.visualize()
   --love.graphics.setColor(0, 1, 0) 
   love.graphics.draw(player.bottomImage, player.x, player.y, player.angle, 0.5, 0.5, player.playerWidth / 2, player.playerHeight / 2)
   rotateToMouse()
-  love.graphics.draw(player.topImage, player.x, player.y, player.topRotation, 0.5, 0.5, player.TopWidth / 2, (player.TopHeight / 2) + 12)
+  local localTop = player.topImage
+  if (player.canShoot == false or love.keyboard.isDown("w") or love.keyboard.isDown("up")) then
+    localTop = player.topImageFALSE
+  end
+  love.graphics.draw(localTop, player.x, player.y, player.topRotation, 0.5, 0.5, player.TopWidth / 2, (player.TopHeight / 2) + 12)
+  --love.graphics.draw(player.topImage, player.x, player.y, player.topRotation, 0.5, 0.5, player.TopWidth / 2, (player.TopHeight / 2) + 12)
   camera:lookAt(player.x, player.y)
 
 

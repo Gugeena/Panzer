@@ -7,6 +7,7 @@ end
 
 function love.update(dt)
   player.move(dt)
+  timer.update(dt)
 end
 
 function love.draw()
