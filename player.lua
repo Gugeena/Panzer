@@ -10,7 +10,6 @@ local rockets = {}
 local moving = false
 local timer = require("timer")
 
-
 function player.loadInformation()
   player.bottomImage = love.graphics.newImage("assets/TankBottom.png")
   player.topImage = love.graphics.newImage("assets/TankTop.png")
@@ -21,9 +20,9 @@ function player.loadInformation()
   player.limitY = 10000000
   player.TopWidth = player.topImage:getWidth()
   player.TopHeight = player.topImage:getHeight()
-  camera = camera();
-  player.RspawnX = player.x;
-  player.RspawnY= player.y - 85;
+  camera = camera()
+  player.RspawnX = player.x
+  player.RspawnY= player.y - 85
   love.graphics.setLineWidth(2)
 end
 
@@ -114,6 +113,9 @@ end
 
 function player.visualize()
   camera:attach()
+
+  camera:lookAt(player.x, player.y)
+
   love.graphics.setColor(0.5, 0, 1)
 
   local startX = math.floor((player.x - love.graphics.getWidth() / 2) / spacing) * spacing
@@ -142,8 +144,6 @@ function player.visualize()
   end
   love.graphics.draw(localTop, player.x, player.y, player.topRotation, 0.5, 0.5, player.TopWidth / 2, (player.TopHeight / 2) + 12)
   --love.graphics.draw(player.topImage, player.x, player.y, player.topRotation, 0.5, 0.5, player.TopWidth / 2, (player.TopHeight / 2) + 12)
-  camera:lookAt(player.x, player.y)
-
 
   -- aint working
 
