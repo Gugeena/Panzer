@@ -1,43 +1,56 @@
 local player = require("player")
 local timer = require("timer")
 local camera = require("libraries/camera")
+local scaling = require("scaling")
 local push = require("libraries/push")
+--local screen = require("screenTesting")
 
-local virtualWidth = 800
-local virtualHeight = 600
+--local virtualWidth = 800
+--local virtualHeight = 600
 
-local windowWidth, windowHeight = love.graphics.getDimensions()
-
-function love.load()  
-  love.graphics.setDefaultFilter("nearest", "nearest")
-  push:setupScreen(virtualWidth, virtualHeight, windowWidth, windowHeight, {
-    fullscreen = false,
-    vsync = true,
-    resizable = false,
-    pixelperfect = true,
+function love.load() 
+   push:setupScreen(800, 600, love.graphics.getWidth(), love.graphics.getHeight(), {
+    resizable = true,
     --highdpi = true,
     --canvas = true
   })
+  --[[
+  love.graphics.setDefaultFilter("nearest", "nearest")
+
+  local windowWidth, windowHeight = love.graphics.getDimensions()
+
+  push:setupScreen(virtualWidth, virtualHeight, windowWidth, windowHeight, {
+    vsync = true,
+    resizable = true,
+    pixelperfect = true
+    --highdpi = true,
+    --canvas = true
+  })
+  ]]
+  
   player.loadInformation()
   camera = camera()
 end
 
 function love.update(dt)
-  --camera:zoom(conf.scale)
-  player.move(dt)
+  player.move(dt, camera)
   timer.update(dt)
 end
 
 function love.draw()
-  push:setBorderColor(1,1,1)
   --push:start()
-  --camera:attach()
-  --camera:lookAt(player.x, player.y)
+  camera:attach()
+  camera:lookAt(player.x, player.y)
+  --love.graphics.scale(virtualWidth / windowWidth, virtualHeight / windowHeight)
   player.visualize()
-  --camera:detach()
+  camera:detach()
   --push:finish()
 end
 
 function love.resize(w, h)
-  push:resize(w, h)
+  --push:resize(w, h)
+  --windowWidth, windowHeight = love.graphics.getDimensions()
+  print("sheni dedamovtyan")
+  player.changeWidth(scaling.scale())
+  --screen.resize(w, h)
 end

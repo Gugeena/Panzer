@@ -1,14 +1,15 @@
 --local player = { x = 100, y = 100, speed = 200, playerWidth = 50, playerHeight = 50 }
 local decleration = "I love you"
-local player = { x = 100, y = 100, speed = 200, playerWidth = 0, playerHeight = 0, limitX = 0, limitY = 0, bottomImage, topImage, angle = 0, bodyAngle = 0, TopWidth = 0, TopHeight = 0, RspawnX = 0, RspawnY = 0, topRotation = 0, topImageFALSE} 
+local player = { x = 100, y = 100, speed = 200, playerWidth = 0, playerHeight = 0, limitX = 0, limitY = 0, bottomImage, topImage, angle = 0, bodyAngle = 0, TopWidth = 0, TopHeight = 0, topRotation = 0, topImageFALSE} 
 local spacing = 32;
-local camera = require("libraries/camera")
 local rocket = require("rocket")
 local shot = false;
 player.canShoot = true;
 local rockets = {}
 local moving = false
 local timer = require("timer")
+local scale = require("scaling")
+local endOffSet = 26;
 
 function player.loadInformation()
   player.bottomImage = love.graphics.newImage("assets/TankBottom.png")
@@ -20,14 +21,13 @@ function player.loadInformation()
   player.limitY = 10000000
   player.TopWidth = player.topImage:getWidth()
   player.TopHeight = player.topImage:getHeight()
-  camera = camera()
-  player.RspawnX = player.x
-  player.RspawnY= player.y - 85
   love.graphics.setLineWidth(2)
+  spacing = spacing * scale.scale();
 end
 
-function player.move(dt)
+function player.move(dt, cam)
   Movement(dt)
+  rotateToMouse(cam)
 end
 
 function Movement(dt)
@@ -46,18 +46,16 @@ function Movement(dt)
     local yChange = math.sin(player.angle + math.rad(90)) * player.speed * dt
     player.x = player.x - xChange
     player.y = player.y - yChange
-    player.RspawnX = player.RspawnX - xChange
-    player.RspawnY = player.RspawnY - yChange
     moving = true;
   end
 
 
   if(love.mouse.isDown(1) and player.canShoot and moving == false) then
     player.canShoot = false;
-    local offset = 86;
+    local offset = 86 * scale.scale();
     local spawnX = player.x - math.cos(player.topRotation + math.rad(90)) * offset
     local spawnY = player.y - math.sin(player.topRotation + math.rad(90)) * offset
-    rocket.load(true, spawnX, spawnY , player.topRotation, player.playerWidth, player.playerHeight, 1000)
+    rocket.load(true, spawnX, spawnY , player.topRotation, player.playerWidth, player.playerHeight, 1000, 350 * scale.scale())
 
     if(player.canShoot == false) then 
 
@@ -98,9 +96,8 @@ function Movement(dt)
   moving = false
 end
 
-function rotateToMouse()
-  local mouseX, mouseY = camera:worldCoords(love.mouse.getX(), love.mouse.getY())
-  --local mouseY = camera:worldCoords(love.mouse.getY())
+function rotateToMouse(cam)
+  local mouseX, mouseY = cam:worldCoords(love.mouse.getX(), love.mouse.getY())
 
   --local centerX = player.x + player.playerWidth / 2
   --local centerY = player.y + player.playerHeight / 2
@@ -112,17 +109,14 @@ function rotateToMouse()
 end
 
 function player.visualize()
-  camera:attach()
-
-  camera:lookAt(player.x, player.y)
-
   love.graphics.setColor(0.5, 0, 1)
 
   local startX = math.floor((player.x - love.graphics.getWidth() / 2) / spacing) * spacing
   local startY = math.floor((player.y - love.graphics.getHeight() / 2) / spacing) * spacing
 
-  local endX  = (math.floor((player.x + love.graphics.getWidth() / 2) / spacing) * spacing)  + 26
-  local endY  = (math.floor((player.y + love.graphics.getHeight() / 2) / spacing) * spacing)  + 26
+  love.graphics.print(decleration, player.x - 576 , player.y - 230) 
+  local endX  = (math.floor((player.x + love.graphics.getWidth() / 2) / spacing) * spacing)  + endOffSet
+  local endY  = (math.floor((player.y + love.graphics.getHeight() / 2) / spacing) * spacing)  + endOffSet
 
   for x = startX, endX, spacing 
   do
@@ -136,13 +130,12 @@ function player.visualize()
 
   love.graphics.setColor(1, 1, 1)
   --love.graphics.setColor(0, 1, 0) 
-  love.graphics.draw(player.bottomImage, player.x, player.y, player.angle, 0.5, 0.5, player.playerWidth / 2, player.playerHeight / 2)
-  rotateToMouse()
+  love.graphics.draw(player.bottomImage, player.x, player.y, player.angle, 0.5 * scale.scale(), 0.5 * scale.scale(), player.playerWidth / 2, player.playerHeight / 2)
   local localTop = player.topImage
   if (player.canShoot == false or love.keyboard.isDown("w") or love.keyboard.isDown("up")) then
     localTop = player.topImageFALSE
   end
-  love.graphics.draw(localTop, player.x, player.y, player.topRotation, 0.5, 0.5, player.TopWidth / 2, (player.TopHeight / 2) + 12)
+  love.graphics.draw(localTop, player.x, player.y, player.topRotation, 0.5 * scale.scale(), 0.5 * scale.scale(), player.TopWidth / 2, (player.TopHeight / 2) + 12)
   --love.graphics.draw(player.topImage, player.x, player.y, player.topRotation, 0.5, 0.5, player.TopWidth / 2, (player.TopHeight / 2) + 12)
 
   -- aint working
@@ -151,8 +144,12 @@ function player.visualize()
    rocket.update(love.timer.getDelta())
    rocket.visualize()
   end
+end
 
-  camera:detach()
+function player.changeWidth(size)
+  love.graphics.setLineWidth(2 * size) 
+  spacing = 32 * size;  
+  endOffSet = 26 * size;
 end
 
 return player
