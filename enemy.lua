@@ -14,5 +14,6 @@ function Enemy.new(hp, x, y, angle, speed, width, height)
   newEnemy.distance = 0
   return newEnemy
 end
+--
 
 return Enemy
