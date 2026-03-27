@@ -3,14 +3,15 @@ local timer = require("timer")
 local camera = require("libraries/camera")
 local scaling = require("scaling")
 local push = require("libraries/push")
+local enemy = require("Tankenemy");
 --local screen = require("screenTesting")
 
 --local virtualWidth = 800
 --local virtualHeight = 600
 
 function love.load() 
-   push:setupScreen(800, 600, love.graphics.getWidth(), love.graphics.getHeight(), {
-    resizable = true,
+  push:setupScreen(800, 600, love.graphics.getWidth(), love.graphics.getHeight(), {
+  --resizable = true,
     --highdpi = true,
     --canvas = true
   })
@@ -30,11 +31,14 @@ function love.load()
   
   player.loadInformation()
   camera = camera()
+  enemy.load();
+  enemy.createNewTank(100, 100);
 end
 
 function love.update(dt)
   player.move(dt, camera)
   timer.update(dt)
+  enemy:update(player.x, player.y, dt);
 end
 
 function love.draw()
@@ -43,6 +47,7 @@ function love.draw()
   camera:lookAt(player.x, player.y)
   --love.graphics.scale(virtualWidth / windowWidth, virtualHeight / windowHeight)
   player.visualize()
+  enemy:visualize();
   camera:detach()
   --push:finish()
 end

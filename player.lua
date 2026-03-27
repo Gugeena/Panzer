@@ -17,8 +17,8 @@ function player.loadInformation()
   player.playerWidth = player.bottomImage:getWidth()
   player.topImageFALSE  = love.graphics.newImage("assets/TankTopCANT.png")
   player.playerHeight = player.bottomImage:getHeight()
-  player.limitX = 10000000
-  player.limitY = 10000000
+  --player.limitX = 10000000
+  --player.limitY = 10000000
   player.TopWidth = player.topImage:getWidth()
   player.TopHeight = player.topImage:getHeight()
   love.graphics.setLineWidth(2)
@@ -150,6 +150,7 @@ function player.changeWidth(size)
   love.graphics.setLineWidth(2 * size) 
   spacing = 32 * size;  
   endOffSet = 26 * size;
+  player.speed = 200 * size;
 end
 
 return player
