@@ -10,8 +10,9 @@ local moving = false
 local timer = require("timer")
 local scale = require("scaling")
 local endOffSet = 26;
+local rockets = {};
 
-function player.loadInformation()
+function player.loadInformation(r)
   player.bottomImage = love.graphics.newImage("assets/TankBottom.png")
   player.topImage = love.graphics.newImage("assets/TankTop.png")
   player.playerWidth = player.bottomImage:getWidth()
@@ -23,6 +24,7 @@ function player.loadInformation()
   player.TopHeight = player.topImage:getHeight()
   love.graphics.setLineWidth(2)
   spacing = spacing * scale.scale();
+  rockets = r;
 end
 
 function player.move(dt, cam)
@@ -55,8 +57,8 @@ function Movement(dt)
     local offset = 86 * scale.scale();
     local spawnX = player.x - math.cos(player.topRotation + math.rad(90)) * offset
     local spawnY = player.y - math.sin(player.topRotation + math.rad(90)) * offset
-    rocket.load(true, spawnX, spawnY , player.topRotation, player.playerWidth, player.playerHeight, 1000, 350 * scale.scale())
-
+    local r = rocket.newRocket(spawnX, spawnY, player.topRotation);
+    table.insert(rockets, r);
     if(player.canShoot == false) then 
 
     timer.crt(1.5,
@@ -140,10 +142,10 @@ function player.visualize()
 
   -- aint working
 
-  if(shot) then
-   rocket.update(love.timer.getDelta())
-   rocket.visualize()
-  end
+  --if(shot) then
+   --rocket.update(love.timer.getDelta())
+   --rocket:visualize()
+  --end
 end
 
 function player.changeWidth(size)
