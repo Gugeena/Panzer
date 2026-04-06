@@ -11,7 +11,7 @@ local timer = require("timer")
 local scale = require("scaling")
 local endOffSet = 26;
 local rockets = {};
-
+//
 function player.loadInformation(r)
   player.bottomImage = love.graphics.newImage("assets/TankBottom.png")
   player.topImage = love.graphics.newImage("assets/TankTop.png")
