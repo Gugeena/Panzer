@@ -1,17 +1,15 @@
 --local player = { x = 100, y = 100, speed = 200, playerWidth = 50, playerHeight = 50 }
 local decleration = "I love you"
-local player = { x = 100, y = 100, speed = 200, playerWidth = 0, playerHeight = 0, limitX = 0, limitY = 0, bottomImage, topImage, angle = 0, bodyAngle = 0, TopWidth = 0, TopHeight = 0, topRotation = 0, topImageFALSE} 
+local player = {x = 100, y = 100, speed = 200, playerWidth = 0, playerHeight = 0, limitX = 0, limitY = 0, bottomImage, topImage, angle = 0, bodyAngle = 0, TopWidth = 0, TopHeight = 0, topRotation = 0, topImageFALSE, deathParticles, dead = false, deatehParticlesVisual, canShoot = true} 
 local spacing = 32;
 local rocket = require("rocket")
-local shot = false;
-player.canShoot = true;
-local rockets = {}
 local moving = false
 local timer = require("timer")
 local scale = require("scaling")
+local ParticleGenerator = require("ParticleGenerator");
 local endOffSet = 26;
 local rockets = {};
-//
+
 function player.loadInformation(r)
   player.bottomImage = love.graphics.newImage("assets/TankBottom.png")
   player.topImage = love.graphics.newImage("assets/TankTop.png")
@@ -25,29 +23,37 @@ function player.loadInformation(r)
   love.graphics.setLineWidth(2)
   spacing = spacing * scale.scale();
   rockets = r;
+  player.dead = false;
+  player.deathParticles = ParticleGenerator.newParticle(player.x, player.y, 400, scale.scale())
 end
 
-function player.move(dt, cam)
-  Movement(dt)
-  rotateToMouse(cam)
+function player:update(dt, cam)
+  if(self.dead == false) then
+    player:Movement(dt)
+    rotateToMouse(cam)
+  else
+    print("updating");
+    self.deathParticles:update(dt);
+  end
 end
 
-function Movement(dt)
+function player:Movement(dt)
+  if (self.dead == false) then
   if love.keyboard.isDown("d") or love.keyboard.isDown("right")  then   
-    player.angle = player.angle + 1 * dt
+    self.angle = self.angle + 1 * dt
   end
 
   if love.keyboard.isDown("a") or love.keyboard.isDown("left")  then   
-    player.angle = player.angle - 1 * dt
+    self.angle = self.angle - 1 * dt
   end
 
   if love.keyboard.isDown("w") or love.keyboard.isDown("up")  then   
     --player.x = player.x - math.cos(player.angle + math.rad(90)) * player.speed * dt
     --player.y = player.y - math.sin(player.angle + math.rad(90)) * player.speed * dt
-    local xChange = math.cos(player.angle + math.rad(90)) * player.speed * dt
-    local yChange = math.sin(player.angle + math.rad(90)) * player.speed * dt
-    player.x = player.x - xChange
-    player.y = player.y - yChange
+    local xChange = math.cos(player.angle + math.rad(90)) * self.speed * dt
+    local yChange = math.sin(player.angle + math.rad(90)) * self.speed * dt
+    self.x = self.x - xChange
+    self.y = self.y - yChange
     moving = true;
   end
 
@@ -68,7 +74,7 @@ function Movement(dt)
 
     end)
     end
-    shot = true;
+  end
   end
   --   if player.x < player.limitX then
   --   if love.keyboard.isDown("d") or love.keyboard.isDown("right")  then   
@@ -110,15 +116,15 @@ function rotateToMouse(cam)
   player.topRotation = math.atan2(deltaY, deltaX) + math.rad(90)
 end
 
-function player.visualize()
+function player:visualize()
   love.graphics.setColor(0.5, 0, 1)
 
-  local startX = math.floor((player.x - love.graphics.getWidth() / 2) / spacing) * spacing
-  local startY = math.floor((player.y - love.graphics.getHeight() / 2) / spacing) * spacing
+  local startX = math.floor((self.x - love.graphics.getWidth() / 2) / spacing) * spacing
+  local startY = math.floor((self.y - love.graphics.getHeight() / 2) / spacing) * spacing
 
-  love.graphics.print(decleration, player.x - 576 , player.y - 230) 
-  local endX  = (math.floor((player.x + love.graphics.getWidth() / 2) / spacing) * spacing)  + endOffSet
-  local endY  = (math.floor((player.y + love.graphics.getHeight() / 2) / spacing) * spacing)  + endOffSet
+  love.graphics.print(decleration, self.x - 576 , self.y - 230) 
+  local endX  = (math.floor((self.x + love.graphics.getWidth() / 2) / spacing) * spacing)  + endOffSet
+  local endY  = (math.floor((self.y + love.graphics.getHeight() / 2) / spacing) * spacing)  + endOffSet
 
   for x = startX, endX, spacing 
   do
@@ -132,12 +138,17 @@ function player.visualize()
 
   love.graphics.setColor(1, 1, 1)
   --love.graphics.setColor(0, 1, 0) 
-  love.graphics.draw(player.bottomImage, player.x, player.y, player.angle, 0.5 * scale.scale(), 0.5 * scale.scale(), player.playerWidth / 2, player.playerHeight / 2)
-  local localTop = player.topImage
-  if (player.canShoot == false or love.keyboard.isDown("w") or love.keyboard.isDown("up")) then
-    localTop = player.topImageFALSE
+  if (self.dead == false) then
+  love.graphics.draw(self.bottomImage, self.x, self.y, self.angle, 0.5 * scale.scale(), 0.5 * scale.scale(), self.playerWidth / 2, self.playerHeight / 2)
+  local localTop = self.topImage
+  if (self.canShoot == false or love.keyboard.isDown("w") or love.keyboard.isDown("up")) then
+    localTop = self.topImageFALSE
   end
-  love.graphics.draw(localTop, player.x, player.y, player.topRotation, 0.5 * scale.scale(), 0.5 * scale.scale(), player.TopWidth / 2, (player.TopHeight / 2) + 12)
+  love.graphics.draw(localTop, self.x, self.y, self.topRotation, 0.5 * scale.scale(), 0.5 * scale.scale(), self.TopWidth / 2, (self.TopHeight / 2) + 12)
+else 
+  love.graphics.draw(self.deathParticles);
+end
+
   --love.graphics.draw(player.topImage, player.x, player.y, player.topRotation, 0.5, 0.5, player.TopWidth / 2, (player.TopHeight / 2) + 12)
 
   -- aint working
@@ -153,6 +164,12 @@ function player.changeWidth(size)
   spacing = 32 * size;  
   endOffSet = 26 * size;
   player.speed = 200 * size;
+end
+
+function player:death()
+  print("dead");
+  self.dead = true;
+  self.deathParticles:setPosition(self.x, self.y);
 end
 
 return player

@@ -1,4 +1,4 @@
-            local tankEnemy = {x = 0, y = 0, speed = 160, enemyWidth = 0, enemyHeight = 0, limitX = 0, limitY = 0, bottomImage, topImage, angle = 0, bodyAngle = 0, TopWidth = 0, TopHeight = 0, topRotation = 0, topImageFALSE, canMove = false, canAttack = true;};
+    local tankEnemy = {x = 0, y = 0, speed = 160, enemyWidth = 0, enemyHeight = 0, limitX = 0, limitY = 0, bottomImage, topImage, angle = 0, bodyAngle = 0, TopWidth = 0, TopHeight = 0, topRotation = 0, topImageFALSE, canMove = false, canAttack = true;};
 
     tankEnemy.__index = tankEnemy;
 

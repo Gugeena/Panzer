@@ -1,9 +1,10 @@
-local rocket = {image, x, y, speed, angle, playerWidth, playerHeight, range, spriteSheet, grid, animations, particleEnd, pSystem, doneFor, rocketWidth, rocketHeight, exploding}
+local rocket = {image, x, y, speed, angle, playerWidth, playerHeight, range, spriteSheet, grid, animations, particleEnd, pSystem, doneFor, rocketWidth, rocketHeight, exploding, isRocket}
 local anim8 = require("libraries/anim8")
 local timer = require("timer")
 local scale = require("scaling")
+local ParticleGenerator = require("ParticleGenerator");
+local rocketCount = -1;
 rocket.__index = rocket;
---local screen = require("screenTesting")
 
 function rocket.newRocket(x, y, angle)
   local newRocket = setmetatable({}, rocket)
@@ -13,23 +14,14 @@ function rocket.newRocket(x, y, angle)
   newRocket.spriteSheet = rocket.spriteSheet;
   newRocket.doneFor = false;
   newRocket.exploding = false;
-  newRocket.pSystem = love.graphics.newParticleSystem(rocket.particleEnd, 100)
-  newRocket.pSystem:setParticleLifetime(0.5, 0.7)
-  newRocket.pSystem:setEmissionRate(0)
-  newRocket.pSystem:setSpeed(100 * scale.scale(), 150 * scale.scale())
-  newRocket.pSystem:setDirection(0)
-  newRocket.pSystem:setSpread(math.pi * 2)
-  newRocket.pSystem:setLinearAcceleration(0, 0, 0, 0)
-  newRocket.pSystem:setColors(1,1,1,1,
-                    1,1,1,0)
-  newRocket.pSystem:setPosition(x, y)
-  newRocket.pSystem:setSizes(0.5 * scale.scale(), 0.4 * scale.scale(), 0)
-
-  timer.crt(0.9, function() 
+  --newRocket.id = rocketCount+1;
+  newRocket.pSystem = ParticleGenerator.newParticle(x, y, 100, scale.scale())
+  --table.insert(ParticleGenerator.Particles, newRocket.pSystem);
+  timer.crt(1.5, function() 
     newRocket.exploding = true 
-    newRocket.pSystem:setPosition(newRocket.x, newRocket.y)
+    newRocket.pSystem:setPosition(newRocket.x, newRocket.y);
     newRocket.pSystem:emit(50)
-     timer.crt(0.8, function() 
+     timer.crt(1.2, function() 
      newRocket.doneFor = true 
     end)
     end)
@@ -38,17 +30,17 @@ end
   
 function rocket.load(playerWidth, playerHeight, range, speed)
   rocket.image = love.graphics.newImage("assets/rocketPlayer.png") 
-  rocket.particleEnd = love.graphics.newImage("assets/RocketEndParticle.png")
   rocket.playerWidth = playerWidth
   rocket.playerHeight = playerHeight
   rocket.range = range
-  rocket.speed = speed
+  rocket.speed = speed;
   rocket.spriteSheet = love.graphics.newImage("assets/rocketFrames-Sheet.png")
-  rocket.width = rocket.spriteSheet:getWidth() / 2 
-  rocket.height = rocket.spriteSheet:getHeight()
+  rocket.width = rocket.spriteSheet:getWidth() / 4
+  rocket.height = rocket.spriteSheet:getHeight() / 2
   rocket.grid = anim8.newGrid(78, 192, rocket.spriteSheet:getWidth(), rocket.spriteSheet:getHeight())
   rocket.animations = {}
   rocket.animations.idle = anim8.newAnimation(rocket.grid('1-2', 1), 0.1)
+  rocket.isRocket = true;
 end
 
 function rocket:update(dt)
@@ -59,12 +51,12 @@ function rocket:update(dt)
   else 
     self.pSystem:update(dt) 
   end
-  --timer.update(dt)
+  timer.update(dt)
 end
 
 function rocket:visualize()
    --love.graphics.circle("fill", rocket.x, rocket.y, 10)
-  if(self.exploding == false) then self.animations.idle:draw(rocket.spriteSheet, self.x, self.y, self.angle, 0.4 * scale.scale(), 0.4 * scale.scale(), rocket.width / 2, rocket.height / 2)
+  if(self.exploding == false) then self.animations.idle:draw(rocket.spriteSheet, self.x, self.y, self.angle, 0.4 * scale.scale(), 0.4 * scale.scale(), rocket.width, rocket.height)
   else  love.graphics.draw(self.pSystem) 
   end
   --love.graphics.draw(rocket.spriteSheet, rocket.x, rocket.y, rocket.angle, 1, 1, rocket.image:getWidth() / 2, rocket.image:getHeight() / 2)
