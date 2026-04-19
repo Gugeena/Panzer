@@ -1,6 +1,6 @@
 local collisions = {};
 
-function collisions.collisions(rockets, player, dt, scale, Particles, enemies)
+function collisions.collisions(rockets, player, dt, scale)
     for i = #rockets, 1, -1 do
     rockets[i]:update(dt);
     --if (rockets[i].exploding == true and rockets[i].doneFor == false) then Particles[i]:update(rockets[i], rockets[i].x, rockets[i].y);
@@ -14,12 +14,7 @@ function collisions.collisions(rockets, player, dt, scale, Particles, enemies)
       table.remove(rockets, i); 
       player:death();
     end
-
-    
-    for i = #enemies, 1, -1 do
-    enemies[i]:update(dt);
   end
-end
 end
 end
 

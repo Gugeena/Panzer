@@ -117,25 +117,6 @@ function rotateToMouse(cam)
 end
 
 function player:visualize()
-  love.graphics.setColor(0.5, 0, 1)
-
-  local startX = math.floor((self.x - love.graphics.getWidth() / 2) / spacing) * spacing
-  local startY = math.floor((self.y - love.graphics.getHeight() / 2) / spacing) * spacing
-
-  love.graphics.print(decleration, self.x - 576 , self.y - 230) 
-  local endX  = (math.floor((self.x + love.graphics.getWidth() / 2) / spacing) * spacing)  + endOffSet
-  local endY  = (math.floor((self.y + love.graphics.getHeight() / 2) / spacing) * spacing)  + endOffSet
-
-  for x = startX, endX, spacing 
-  do
-    love.graphics.line(x, startY, x, endY)
-  end
-
-  for y = startY, endY, spacing
-  do
-    love.graphics.line(startX, y, endX, y)
-  end
-
   love.graphics.setColor(1, 1, 1)
   --love.graphics.setColor(0, 1, 0) 
   if (self.dead == false) then

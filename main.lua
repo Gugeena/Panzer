@@ -15,6 +15,7 @@ local boundsX, boundsY;
 local spacing;
 local enemyGen = require("enemyGenerator");
 local enemies = {};
+local boundsC = require("bounds");
 --local screen = require("screenTesting")
 
 --local virtualWidth = 800
@@ -36,6 +37,7 @@ function love.load()
   spacing = 32 * currentScale;
   boundsX, boundsY = windowWidth / 2, windowHeight / 2;
 
+  enemy.load(rockets);
   player.loadInformation(rockets)
   rocket.load(player.playerWidth, player.playerHeight, 1000, 350 * currentScale)
   camera = camera()
@@ -47,7 +49,11 @@ function love.update(dt)
   player:update(dt, camera)
   timer.update(dt)
   --enemy:update(player.x, player.y, dt);
-  collisions.collisions(rockets, player, dt, currentScale, ParticleGenerator.Particles, enemies);
+  enemyGen.generate(enemy, enemies, dt, player, boundsX, boundsY, spacing);
+  collisions.collisions(rockets, player, dt, currentScale);
+  for i = #enemies, 1, -1 do
+    enemies[i]:update(player.x, player.y, dt);
+  end
 end
 
 --[]
@@ -64,7 +70,6 @@ function love.draw()
   --push:start()
   camera:attach()
   camera:lookAt(player.x, player.y)
-  enemyGen.generate(enemy, 1, enemies)
   ----scale(virtualWidth / windowWidth, virtualHeight / windowHeight)
   backGroundVisualise();
   player:visualize();
@@ -81,6 +86,7 @@ function love.draw()
   --pop();
   --]
   for _, r in ipairs(rockets) do r:visualize(); end
+  for _, e in ipairs(enemies) do e:visualize(); end
   camera:detach()
   --push:finish()
 end
@@ -93,20 +99,8 @@ function love.resize(w, h)
   --screen.resize(w, h)
 end
 
-function bounds()
-  local endOffset = 26;
-
-  local startX = math.floor((player.x - boundsX) / spacing) * spacing
-  local startY = math.floor((player.y - boundsY) / spacing) * spacing
-
-  local endX  = (math.floor((player.x + boundsX) / spacing) * spacing)  + endOffset
-  local endY  = (math.floor((player.y + boundsY) / spacing) * spacing)  + endOffset
-
-  return startX, endX, startY, endY;
-end
-
 function backGroundVisualise()
-  local startX, endX, startY, endY = bounds();
+  local startX, endX, startY, endY = boundsC.bounds(player, boundsX, boundsY, spacing);
 
   love.graphics.setColor(0.5, 0, 1)
 

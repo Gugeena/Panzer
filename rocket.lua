@@ -51,7 +51,6 @@ function rocket:update(dt)
   else 
     self.pSystem:update(dt) 
   end
-  timer.update(dt)
 end
 
 function rocket:visualize()

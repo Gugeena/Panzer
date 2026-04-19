@@ -43,7 +43,7 @@
 
     function tankEnemy:lookAtPlayerBody(x, y, dt)
         if(self.canMove == true) then
-        local distanceX, distanceY, distance = tankEnemy:calculateDistance(x, y);
+        local distanceX, distanceY, distance = self:calculateDistance(x, y);
         if(distance > 300) then
         local deltaX, deltaY = self:ToPlayer(x, y);
         local targetAngle = math.atan2(deltaY,deltaX) + math.rad(90);
@@ -54,7 +54,7 @@
         end
     end
     end
-    end
+    end 
 
     function tankEnemy:ToPlayer(x, y)
         return x - self.x, y - self.y;
@@ -62,7 +62,6 @@
 
     function tankEnemy:update(playerX, playerY, dt)
         self:lookAtPlayer(playerX, playerY);
-        self:visualize();
         self:lookAtPlayerBody(playerX, playerY, dt);
         self:goToPlayer(playerX, playerY, dt)
     end
@@ -75,7 +74,7 @@
     end
 
     function tankEnemy:goToPlayer(x, y, dt)
-        local distanceX, distanceY, distance = tankEnemy:calculateDistance(x, y);
+        local distanceX, distanceY, distance = self:calculateDistance(x, y);
         if(distance > 300 and self.canMove == true) then
             if(self:isPointingAt(x, y)) then
             self.x = self.x + (distanceX / distance) * tankEnemy.speed * dt;
@@ -112,7 +111,7 @@
 
         local dot = directionX * bodyDirectionX + directionY * bodyDirectionY;
 
-        return dot > 0.99;
+        return dot > 0.8;
     end
 
     function tankEnemy:calculateDistance(x, y)
