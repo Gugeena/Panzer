@@ -1,6 +1,6 @@
 --local player = { x = 100, y = 100, speed = 200, playerWidth = 50, playerHeight = 50 }
 local decleration = "I love you"
-local player = {x = 0, y = 0, speed = 200, playerWidth = 0, playerHeight = 0, limitX = 0, limitY = 0, bottomImage, topImage, angle = 0, bodyAngle = 0, TopWidth = 0, TopHeight = 0, topRotation = 0, topImageFALSE, deathParticles, dead = false, deatehParticlesVisual, canShoot = true, score = 0, gameOver = false, wasJustDead = false} 
+local player = {x = 0, y = 0, speed = 200, playerWidth = 0, playerHeight = 0, limitX = 0, limitY = 0, bottomImage, topImage, angle = 0, bodyAngle = 0, TopWidth = 0, TopHeight = 0, topRotation = 0, topImageFALSE, deathParticles, dead = false, deatehParticlesVisual, canShoot = true, score = 0, gameOver = false, wasJustDead = false, maxScore = 0} 
 local spacing = 32;
 local rocket = require("rocket")
 local moving = false
@@ -20,6 +20,12 @@ function player.loadInformation(r)
   player.topRotation = 0;
   player.bodyAngle = 0;
   player.gameOver = false;
+  if not love.filesystem.getInfo("score.txt") then 
+    love.filesystem.write("score.txt", 0)
+  else 
+    local content = love.filesystem.read("score.txt") or 0;
+    player.maxScore = tonumber(content) or 0;
+  end
   --player.limitX = 10000000
   --player.limitY = 10000000
   player.TopWidth = player.topImage:getWidth()
@@ -36,7 +42,6 @@ function player:update(dt, cam)
     player:Movement(dt)
     rotateToMouse(cam)
   else
-    print("updating");
     self.deathParticles:update(dt);
   end
 end
@@ -133,7 +138,6 @@ function player:visualize()
 else 
   --self.deathParticles:draw()
   love.graphics.draw(self.deathParticles);
-  print("Drawing");
 end
 
   --love.graphics.draw(player.topImage, player.x, player.y, player.topRotation, 0.5, 0.5, player.TopWidth / 2, (player.TopHeight / 2) + 12)
@@ -159,8 +163,14 @@ function player:death()
   self.deathParticles:setPosition(self.x, self.y);
   self.deathParticles:emit(100);
   self.wasJustDead = true;
+  if(self.maxScore < self.score) then 
+    love.filesystem.write("score.txt", tostring(self.score)); 
+    self.maxScore = self.score;
+  end
   timer.crt(0.8, function ()
     self.gameOver = true;
+    print(self.score);
+    print(self.maxScore);
   end)
 end
 

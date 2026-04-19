@@ -107,7 +107,7 @@
         if(self.infunction == true) then return end;
         self.infunction = true;
         timer.crt(0.2, function ()
-            if(player.dead == true) then return end;
+            if(player.dead == true or self.dead == true) then return end;
             self.canAttack = false;
         local offset = 86 * scale.scale();
         local spawnX = self.x - math.cos(self.topRotation + math.rad(90)) * offset

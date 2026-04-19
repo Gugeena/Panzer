@@ -140,6 +140,8 @@ function love.draw()
   if(showGameOverText) then 
     love.graphics.setColor(1, 0, 0.5, 1);
     love.graphics.print("SYSTEM DOWN", 311,200);
+    love.graphics.setColor(1, 0.843, 0)
+    love.graphics.print("PEAK " .. player.maxScore, 343,240);
     love.graphics.setColor(0.5, 0, 1);
     love.graphics.rectangle("line", mybutton.x, mybutton.y + 15, mybutton.width, mybutton.height);
     love.graphics.setColor(0, 0.5, 1);
