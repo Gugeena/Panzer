@@ -1,6 +1,6 @@
 local collisions = {};
 
-function collisions.collisions(rockets, player, dt, scale)
+function collisions.collisions(rockets, player, dt, scale, enemies)
     for i = #rockets, 1, -1 do
     rockets[i]:update(dt);
     --if (rockets[i].exploding == true and rockets[i].doneFor == false) then Particles[i]:update(rockets[i], rockets[i].x, rockets[i].y);
@@ -10,11 +10,25 @@ function collisions.collisions(rockets, player, dt, scale)
     local localX, localY = findLocalPositionsTyvnaTvinisSirobaaMagari(player.angle, rockets[i].x, rockets[i].y, player.x, player.y);
     local scaleFactor = 0.5 * scale;
     local width,height = (player.playerWidth / 2) * scaleFactor, (player.playerHeight / 2) * scaleFactor;
-    if localX >= -width and localX <= width and localY >= -height and localY <= height then
+    if localX >= -width and localX <= width and localY >= -height and localY <= height and not player.dead then
       table.remove(rockets, i); 
       player:death();
+      goto continue;
+    end
+   
+    for j = #enemies, 1, -1 do
+      local enemy = enemies[j];
+      local eX, eY = findLocalPositionsTyvnaTvinisSirobaaMagari(enemy.angle, rockets[i].x, rockets[i].y, enemy.x, enemy.y);
+      local ewidth,eheight = (enemy.enemyWidth / 2) * scaleFactor, (enemy.enemyHeight / 2) * scaleFactor;
+      if eX >= -width and eX <= width and eY >= -height and eY <= height then
+      table.remove(rockets, i); 
+      enemy:death();
+      player:incriment();
+      break;
     end
   end
+  end
+    ::continue::
 end
 end
 

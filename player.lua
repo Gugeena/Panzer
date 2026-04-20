@@ -1,6 +1,6 @@
 --local player = { x = 100, y = 100, speed = 200, playerWidth = 50, playerHeight = 50 }
 local decleration = "I love you"
-local player = {x = 100, y = 100, speed = 200, playerWidth = 0, playerHeight = 0, limitX = 0, limitY = 0, bottomImage, topImage, angle = 0, bodyAngle = 0, TopWidth = 0, TopHeight = 0, topRotation = 0, topImageFALSE, deathParticles, dead = false, deatehParticlesVisual, canShoot = true} 
+local player = {x = 0, y = 0, speed = 200, playerWidth = 0, playerHeight = 0, limitX = 0, limitY = 0, bottomImage, topImage, angle = 0, bodyAngle = 0, TopWidth = 0, TopHeight = 0, topRotation = 0, topImageFALSE, deathParticles, dead = false, deatehParticlesVisual, canShoot = true, score = 0, gameOver = false, wasJustDead = false} 
 local spacing = 32;
 local rocket = require("rocket")
 local moving = false
@@ -16,6 +16,10 @@ function player.loadInformation(r)
   player.playerWidth = player.bottomImage:getWidth()
   player.topImageFALSE  = love.graphics.newImage("assets/TankTopCANT.png")
   player.playerHeight = player.bottomImage:getHeight()
+  player.dead = false;
+  player.topRotation = 0;
+  player.bodyAngle = 0;
+  player.gameOver = false;
   --player.limitX = 10000000
   --player.limitY = 10000000
   player.TopWidth = player.topImage:getWidth()
@@ -63,7 +67,7 @@ function player:Movement(dt)
     local offset = 86 * scale.scale();
     local spawnX = player.x - math.cos(player.topRotation + math.rad(90)) * offset
     local spawnY = player.y - math.sin(player.topRotation + math.rad(90)) * offset
-    local r = rocket.newRocket(spawnX, spawnY, player.topRotation);
+    local r = rocket.newRocket(spawnX, spawnY, player.topRotation, false);
     table.insert(rockets, r);
     if(player.canShoot == false) then 
 
@@ -127,7 +131,9 @@ function player:visualize()
   end
   love.graphics.draw(localTop, self.x, self.y, self.topRotation, 0.5 * scale.scale(), 0.5 * scale.scale(), self.TopWidth / 2, (self.TopHeight / 2) + 12)
 else 
+  --self.deathParticles:draw()
   love.graphics.draw(self.deathParticles);
+  print("Drawing");
 end
 
   --love.graphics.draw(player.topImage, player.x, player.y, player.topRotation, 0.5, 0.5, player.TopWidth / 2, (player.TopHeight / 2) + 12)
@@ -148,9 +154,18 @@ function player.changeWidth(size)
 end
 
 function player:death()
-  print("dead");
+  if(self.dead == true) then return; end
   self.dead = true;
   self.deathParticles:setPosition(self.x, self.y);
+  self.deathParticles:emit(100);
+  self.wasJustDead = true;
+  timer.crt(0.8, function ()
+    self.gameOver = true;
+  end)
+end
+
+function player:incriment()
+  self.score = self.score + 50;
 end
 
 return player

@@ -5,7 +5,6 @@ local wait = 2;
 local time = 0;
 
 function enemyGenerator.generate(enemy, enemies, dt, player, boundsX, boundsY, spacing)
-
     time = time + dt;
 
     if(time >= wait) then

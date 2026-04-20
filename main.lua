@@ -1,6 +1,6 @@
 local player = require("player")
 local timer = require("timer")
-local camera = require("libraries/camera")
+local Camera = require("libraries/camera")
 local scaling = require("scaling")
 local push = require("libraries/push")
 local enemy = require("Tankenemy");
@@ -16,12 +16,39 @@ local spacing;
 local enemyGen = require("enemyGenerator");
 local enemies = {};
 local boundsC = require("bounds");
+local alpha = 0;
+local fadeOutSpeed = 1;
+local showGameOverText = false;
+local cam;
+local mybutton = 
+{
+  x = 288;
+  y = 275;
+  width = 200,
+  height = 50,
+  --text = "Do Better",
+  text = "Do Worse",
+  --fn = function() love.load()
+  fn = function() love.event.quit();
+  end
+}
 --local screen = require("screenTesting")
 
 --local virtualWidth = 800
 --local virtualHeight = 600
 
 function love.load() 
+  rockets = {};
+  enemies = {};
+  alpha = 0;
+  showGameOverText = false;
+  player.gameOver = false;
+  player.dead = false;
+  timer.load();
+  love.mouse.setVisible(true)
+
+  math.randomseed(os.time());
+  love.graphics.setFont(love.graphics.newFont("/assets/fonts/cruellete.otf", 26));
   local virtualWidth = 1280;
   local virtualHeight = 800;
   local windowWidth, windowHeight = love.graphics.getDimensions();
@@ -40,19 +67,23 @@ function love.load()
   enemy.load(rockets);
   player.loadInformation(rockets)
   rocket.load(player.playerWidth, player.playerHeight, 1000, 350 * currentScale)
-  camera = camera()
+  cam = Camera(); 
   --enemy.load(rockets);
   --enemy.createNewTank(100, 100);
 end
 
 function love.update(dt)
-  player:update(dt, camera)
+  player:update(dt, cam)
   timer.update(dt)
   --enemy:update(player.x, player.y, dt);
   enemyGen.generate(enemy, enemies, dt, player, boundsX, boundsY, spacing);
-  collisions.collisions(rockets, player, dt, currentScale);
+  collisions.collisions(rockets, player, dt, currentScale, enemies);
   for i = #enemies, 1, -1 do
     enemies[i]:update(player.x, player.y, dt);
+  end
+
+  if(player.gameOver and alpha < 1) then
+    alpha = alpha + (fadeOutSpeed * dt);
   end
 end
 
@@ -68,8 +99,8 @@ end
 
 function love.draw()
   --push:start()
-  camera:attach()
-  camera:lookAt(player.x, player.y)
+  cam:attach()
+  cam:lookAt(player.x, player.y)
   ----scale(virtualWidth / windowWidth, virtualHeight / windowHeight)
   backGroundVisualise();
   player:visualize();
@@ -87,14 +118,39 @@ function love.draw()
   --]
   for _, r in ipairs(rockets) do r:visualize(); end
   for _, e in ipairs(enemies) do e:visualize(); end
-  camera:detach()
+  cam:detach()
+
+  love.graphics.origin();
+
+  love.graphics.setColor(0.5, 0, 1);
+  love.graphics.print("PANZER", 10,10);
+  love.graphics.setColor(1, 0, 0.5);
+  love.graphics.print("ONE HIT SYSTEM", 10,50);
+  love.graphics.setColor(0, 0.5, 1);
+  love.graphics.print("BlastOMeter " .. player.score, 10,30);
+
+  if(player.gameOver) then
+    love.graphics.setColor(0,0,0, alpha);
+    love.graphics.rectangle("fill", 0, 0, 1000, 1000);
+    timer.crt(0.8, function ()
+      showGameOverText = true;
+    end)
+  end
+
+  if(showGameOverText) then 
+    love.graphics.setColor(1, 0, 0.5, 1);
+    love.graphics.print("SYSTEM DOWN", 311,200);
+    love.graphics.setColor(0.5, 0, 1);
+    love.graphics.rectangle("line", mybutton.x, mybutton.y + 15, mybutton.width, mybutton.height);
+    love.graphics.setColor(0, 0.5, 1);
+    love.graphics.print(mybutton.text, mybutton.x + 45, mybutton.y + 18);
+  end
   --push:finish()
 end
 
 function love.resize(w, h)
   --push:resize(w, h)
   --windowWidth, windowHeight = --getDimensions()
-  print("sheni dedamovtyan")
   player.changeWidth(scaling.scale())
   --screen.resize(w, h)
 end
@@ -113,4 +169,17 @@ function backGroundVisualise()
   do
     love.graphics.line(startX, y, endX, y)
   end
+end
+
+function love.mousepressed(x, y, button, istouch, presses)
+  if button == 1 then
+    hasPressed(x, y, mybutton.x, mybutton.y, mybutton.width, mybutton.height, mybutton.fn)
+  end
+end
+
+function hasPressed(x, y, bx, by, width, height, func)
+  if x >= bx and x <= (mybutton.x + width) and
+    y >= by and y <= (mybutton.y + height) then
+      func();
+    end
 end

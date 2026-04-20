@@ -6,22 +6,24 @@ local ParticleGenerator = require("ParticleGenerator");
 local rocketCount = -1;
 rocket.__index = rocket;
 
-function rocket.newRocket(x, y, angle)
+function rocket.newRocket(x, y, angle, isEnemy)
   local newRocket = setmetatable({}, rocket)
   newRocket.x = x;
   newRocket.y = y;
   newRocket.angle = angle;
-  newRocket.spriteSheet = rocket.spriteSheet;
+  local spriteSheet = rocket.spriteSheet;
+  if(isEnemy == true) then spriteSheet = love.graphics.newImage("assets/EnemyrocketFrames-Sheet.png"); end
+  newRocket.spriteSheet = spriteSheet;
   newRocket.doneFor = false;
   newRocket.exploding = false;
   --newRocket.id = rocketCount+1;
   newRocket.pSystem = ParticleGenerator.newParticle(x, y, 100, scale.scale())
   --table.insert(ParticleGenerator.Particles, newRocket.pSystem);
-  timer.crt(1.5, function() 
+  timer.crt(0.8, function() 
     newRocket.exploding = true 
     newRocket.pSystem:setPosition(newRocket.x, newRocket.y);
     newRocket.pSystem:emit(50)
-     timer.crt(1.2, function() 
+     timer.crt(0.8, function() 
      newRocket.doneFor = true 
     end)
     end)
@@ -55,7 +57,7 @@ end
 
 function rocket:visualize()
    --love.graphics.circle("fill", rocket.x, rocket.y, 10)
-  if(self.exploding == false) then self.animations.idle:draw(rocket.spriteSheet, self.x, self.y, self.angle, 0.4 * scale.scale(), 0.4 * scale.scale(), rocket.width, rocket.height)
+  if(self.exploding == false) then self.animations.idle:draw(self.spriteSheet, self.x, self.y, self.angle, 0.4 * scale.scale(), 0.4 * scale.scale(), rocket.width, rocket.height)
   else  love.graphics.draw(self.pSystem) 
   end
   --love.graphics.draw(rocket.spriteSheet, rocket.x, rocket.y, rocket.angle, 1, 1, rocket.image:getWidth() / 2, rocket.image:getHeight() / 2)
