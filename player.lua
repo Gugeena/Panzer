@@ -8,6 +8,7 @@ local timer = require("timer")
 local scale = require("scaling")
 local ParticleGenerator = require("ParticleGenerator");
 local endOffSet = 26;
+local AudioManager = require("AudioManager");
 local rockets = {};
 
 function player.loadInformation(r)
@@ -162,6 +163,7 @@ function player:death()
   self.dead = true;
   self.deathParticles:setPosition(self.x, self.y);
   self.deathParticles:emit(100);
+  AudioManager:Texplosion();
   self.wasJustDead = true;
   if(self.maxScore < self.score) then 
     love.filesystem.write("score.txt", tostring(self.score)); 

@@ -20,6 +20,7 @@ local alpha = 0;
 local fadeOutSpeed = 1;
 local showGameOverText = false;
 local cam;
+local AudioManager = require("AudioManager");
 local mybutton = 
 {
   x = 288;
@@ -68,6 +69,9 @@ function love.load()
   player.loadInformation(rockets)
   rocket.load(player.playerWidth, player.playerHeight, 1000, 350 * currentScale)
   cam = Camera(); 
+
+  AudioManager:initialize();
+  AudioManager:playMusic();
   --enemy.load(rockets);
   --enemy.createNewTank(100, 100);
 end
@@ -138,6 +142,7 @@ function love.draw()
   end
 
   if(showGameOverText) then 
+    AudioManager:stopMusic();
     love.graphics.setColor(1, 0, 0.5, 1);
     love.graphics.print("SYSTEM DOWN", 311,200);
     love.graphics.setColor(1, 0.843, 0)

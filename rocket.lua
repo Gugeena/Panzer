@@ -4,6 +4,7 @@ local timer = require("timer")
 local scale = require("scaling")
 local ParticleGenerator = require("ParticleGenerator");
 local rocketCount = -1;
+local AudioManager = require("AudioManager");
 rocket.__index = rocket;
 
 function rocket.newRocket(x, y, angle, isEnemy)
@@ -16,6 +17,7 @@ function rocket.newRocket(x, y, angle, isEnemy)
   newRocket.spriteSheet = spriteSheet;
   newRocket.doneFor = false;
   newRocket.exploding = false;
+  newRocket.exploded = false;
   --newRocket.id = rocketCount+1;
   newRocket.pSystem = ParticleGenerator.newParticle(x, y, 100, scale.scale())
   --table.insert(ParticleGenerator.Particles, newRocket.pSystem);
@@ -23,6 +25,8 @@ function rocket.newRocket(x, y, angle, isEnemy)
     newRocket.exploding = true 
     newRocket.pSystem:setPosition(newRocket.x, newRocket.y);
     newRocket.pSystem:emit(50)
+    if (not newRocket.exploded and not newRocket.doneFor) then AudioManager:Rexplosion(); end
+    newRocket.exploded = true;
      timer.crt(0.8, function() 
      newRocket.doneFor = true 
     end)

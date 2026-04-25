@@ -7,6 +7,7 @@
     local rockets = {};
     local ParticleGenerator = require("ParticleGenerator");
     local player = require("player");
+    local AudioManager = require("AudioManager");
 
     function tankEnemy.load(r)
         tankEnemy.bottomImage = love.graphics.newImage("assets/ENEMYTankBottom.png")
@@ -152,6 +153,7 @@
     function tankEnemy:death()
         if(self.dead == true) then return; end
         self.dead = true;
+        AudioManager:Texplosion();
         self.deathParticles:setPosition(self.x, self.y);
         self.deathParticles:emit(100);
     end
