@@ -16,7 +16,7 @@ function collisions.collisions(rockets, player, dt, scale, enemies)
       rockets[i].exploded = true;
       table.remove(rockets, i); 
       player:death();
-      goto continue;
+      return;
     end
    
     for j = #enemies, 1, -1 do
@@ -32,7 +32,6 @@ function collisions.collisions(rockets, player, dt, scale, enemies)
     end
   end
   end
-    ::continue::
 end
 end
 
